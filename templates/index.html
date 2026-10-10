@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center mb-4">
+    <div class="col-md-8">
+        <div class="card bg-black border-secondary p-3 shadow">
+            <div class="d-flex justify-content-between mb-2">
+                <span class="fw-bold">Заряд батареи ровера</span>
+                <span>{{ (battery / 100 * 100)|round }}%</span>
+            </div>
+            <div class="progress" style="height: 25px;" role="progressbar">
+                <div class="progress-bar {% if battery < 20 %}bg-danger{% elif battery < 50 %}bg-warning{% else %}bg-success{% endif %}" 
+                     style="width: {{ battery }}%;">
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <h3 class="mb-3 text-secondary">Телеметрия подсистем</h3>
+        
+        {% if subsystems %}
+            <div class="list-group gap-3">
+                {% for sub in subsystems %}
+                    <div class="list-group-item card p-3 shadow-sm border-0 
+                        {% if sub.status == ok %}bg-success bg-opacity-10 border-success{% elif sub.status == warning %}bg-warning bg-opacity-10 border-warning{% elif sub.status == critical %}bg-danger bg-opacity-10 border-danger{% endif %} text-light">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h5 class="mb-1 fw-bold">{{ sub.name }}</h5>
+                                <p class="mb-0 text-muted small">Показатель: {{ sub.value }}</p>
+                            </div>
+                            <div class="text-end">
+                                {% if sub.status == ok %}
+                                    <span class="badge bg-success">🟢 OK</span>
+                                {% elif sub.status == warning %}
+                                    <span class="badge bg-warning text-dark">🟡 WARNING</span>
+                                {% elif sub.status == critical %}
+                                    <span class="badge bg-danger">🔴 КРИТИЧЕСКИЙ СТАТУС</span>
+                                    <div class="text-danger small mt-1 fw-bold">⚠ ТРЕБУЕТ ВНИМАНИЯ</div>
+                                {% endif %}
+
+                                {% if sub.value > 90 %}
+                                    <div class="badge bg-dark border border-danger text-danger mt-1">🔥 ПЕРЕГРЕВ</div>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="alert alert-secondary text-center" role="alert">
+                Все системы отключены
+            </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
